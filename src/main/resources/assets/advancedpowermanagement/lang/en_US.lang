@@ -1,0 +1,51 @@
+blockChargingBench1.name=LV Charging Bench
+blockChargingBench2.name=MV Charging Bench
+blockChargingBench3.name=HV Charging Bench
+blockEmitterBlock1.name=LV Emitter
+blockEmitterBlock2.name=MV Emitter
+blockEmitterBlock3.name=HV Emitter
+blockAdjustableTransformer.name=Adjustable Transformer
+blockEmitterAdjustable.name=Adjustable Emitter
+blockBatteryStation1.name=LV Battery Station
+blockBatteryStation2.name=MV Battery Station
+blockBatteryStation3.name=HV Battery Station
+blockStorageMonitor.name=Storage Monitor
+
+AdvPwrMan.dir.down=Down
+AdvPwrMan.dir.up=Up
+AdvPwrMan.dir.north=North
+AdvPwrMan.dir.south=South
+AdvPwrMan.dir.west=West
+AdvPwrMan.dir.east=East
+
+item.benchTools.toolkit.name=Charging Bench Toolkit
+item.benchTools.LV-kit.name=LV Charging Bench Components
+item.benchTools.MV-kit.name=MV Charging Bench Components
+item.benchTools.HV-kit.name=HV Charging Bench Components
+
+item.itemStorageLinkCard.name=Energy Link Card
+item.itemStorageLinkCardCreator.name=Energy Link Card (Blank)
+
+AdvPwrMan.title=Advanced Power Management
+AdvPwrMan.misc.EU=EU
+AdvPwrMan.misc.in=In
+AdvPwrMan.misc.out=Out
+AdvPwrMan.charger.maxEU=Max
+AdvPwrMan.charger.requiredEU=Req
+AdvPwrMan.charger.redstonePower=Pwr
+AdvPwrMan.charger.estimatedTime=ETC
+AdvPwrMan.charger.averageInput=Avg. EU/t In
+AdvPwrMan.emitter.packet=Packet size (Voltage)
+AdvPwrMan.emitter.output=Output / Tick (Max 64 Packets)
+AdvPwrMan.transformer.limit=Transfer Rate (Max 64 Packets)
+AdvPwrMan.monitor.invalid=No Valid Link
+AdvPwrMan.monitor.upper=Upper Threshold (Off)
+AdvPwrMan.monitor.lower=Lower Threshold (On)
+AdvPwrMan.station.modeline1=Only when
+AdvPwrMan.station.modeline2=required
+AdvPwrMan.station.average=Avg. EU/t
+AdvPwrMan.station.remaining=Remaining
+AdvPwrMan.station.led.days= DAYS
+AdvPwrMan.station.led.unknown=UNKNOWN
+AdvPwrMan.station.packetIn=Avg. Pkt In
+AdvPwrMan.station.EUbuffered=EU Buffered
