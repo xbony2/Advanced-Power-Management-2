@@ -194,6 +194,11 @@ public class TEAdvEmitter extends TECommon implements IEnergySource
 			energyBuffer -= packetSize;
 		}
 	}
+	
+	@Override
+	public int getSourceTier() {	
+		return 4; //XXX: cause I dunno what to put...
+	}
 
 	// Networking stuff
 

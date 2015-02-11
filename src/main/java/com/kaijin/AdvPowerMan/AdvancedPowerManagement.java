@@ -49,7 +49,7 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 
-@Mod(modid = "AdvancedPowerManagement", name="Advanced Power Management", version="1.7.2.02", dependencies = "required-after:IC2")
+@Mod(modid = "AdvancedPowerManagement", name="Advanced Power Management", version="2.0.0a", dependencies = "required-after:IC2")
 
 public class AdvancedPowerManagement // implements ICraftingHandler
 {

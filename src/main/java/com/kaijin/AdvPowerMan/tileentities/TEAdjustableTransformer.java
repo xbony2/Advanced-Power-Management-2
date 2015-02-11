@@ -204,8 +204,13 @@ public class TEAdjustableTransformer extends TECommon implements IEnergySource, 
 	}
 
 	@Override
-	public int getMaxSafeInput()
+	public int getSinkTier()
 	{
+		return maxInput;
+	}
+	
+	@Override
+	public int getSourceTier() {
 		return maxInput;
 	}
 
@@ -218,10 +223,8 @@ public class TEAdjustableTransformer extends TECommon implements IEnergySource, 
 	}
 
 	@Override
-	public double demandedEnergyUnits()
-	{
-		if(!receivingRedstoneSignal())
-		{
+	public double getDemandedEnergy(){
+		if(!receivingRedstoneSignal()){
 			final int tickAmt = Math.max(outputRate - energyReceived, 0);
 			final int capAmt = Math.max(energyCap - energyBuffer, 0);
 			//System.out.println("demandsEnergy: " + amt);
@@ -231,13 +234,12 @@ public class TEAdjustableTransformer extends TECommon implements IEnergySource, 
 	}
 
 	@Override
-	public double injectEnergyUnits(ForgeDirection directionFrom, double supply)
-	{
+	public double injectEnergy(ForgeDirection directionFrom, double amount, double voltage) {
 		//System.out.println("energyBuffer: " + energyBuffer);
 		if (AdvancedPowerManagement.proxy.isServer())
 		{
 			// if supply is greater than the max we can take per tick
-			if (supply > maxInput)
+			if (amount > maxInput)
 			{
 				//If the supplied EU is over the baseMaxInput, we're getting
 				//supplied higher than acceptable current. Pop ourselves off
@@ -245,16 +247,16 @@ public class TEAdjustableTransformer extends TECommon implements IEnergySource, 
 				//somehow was 1EU, return zero to keep IC2 from spitting out 
 				//massive errors in the log
 				selfDestroy();
-				if (supply <= 1)
+				if (amount <= 1)
 					return 0;
 				else
-					return supply - 1;
+					return amount - 1;
 			}
 			else
 			{
-				energyReceived += supply;
-				energyBuffer += supply;
-				inputTracker.tick((int)supply);
+				energyReceived += amount;
+				energyBuffer += amount;
+				inputTracker.tick((int)amount);
 			}
 		}
 		return 0;

@@ -35,8 +35,7 @@ import net.minecraftforge.common.util.Constants;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class TEBatteryStation extends TECommonBench implements IEnergySource, IInventory, ISidedInventory
-{
+public class TEBatteryStation extends TECommonBench implements IEnergySource, IInventory, ISidedInventory{
 	public int opMode;
 
 	// Base values
@@ -102,6 +101,11 @@ public class TEBatteryStation extends TECommonBench implements IEnergySource, II
 			outputTracker.tick((int) amount);
 			currentEnergy -= amount;
 		}
+	}
+	
+	@Override
+	public int getSourceTier() {	
+		return 4; //XXX: cause I dunno what to put...
 	}
 
 	// End IC2 API
@@ -204,7 +208,7 @@ public class TEBatteryStation extends TECommonBench implements IEnergySource, II
 	}
 
 	@Override
-	public void updateEntity() //TODO Marked for easy access
+	public void updateEntity()
 	{
 		if (AdvancedPowerManagement.proxy.isClient()) return;
 
@@ -247,45 +251,37 @@ public class TEBatteryStation extends TECommonBench implements IEnergySource, II
 		}
 	}
 
-	private void drainPowerSource()
-	{
+	private void drainPowerSource(){
 		hasEnoughItems = false;
-		for (int i = Info.BS_SLOT_POWER_START; i < Info.BS_SLOT_POWER_START + 12; i++)
-		{
+		for (int i = Info.BS_SLOT_POWER_START; i < Info.BS_SLOT_POWER_START + 12; i++){
 			//if (ChargingBench.isDebugging) System.out.println("currentEnergy: " + currentEnergy + " baseMaxOutput: " + baseMaxOutput);
-			if (currentEnergy >= packetSize)
-			{
+			if (currentEnergy >= packetSize){
 				hasEnoughItems = true;
 				break;
 			}
 
 			ItemStack stack = contents[i];
-			if (stack != null && stack.getItem() instanceof IElectricItem && stack.stackSize == 1)
-			{
+			if (stack != null && stack.getItem() instanceof IElectricItem && stack.stackSize == 1){
 				IElectricItem item = (IElectricItem)(stack.getItem());
-				if (item.getTier(stack) <= powerTier && item.canProvideEnergy(stack))
-				{
+				if (item.getTier(stack) <= powerTier && item.canProvideEnergy(stack)){
 					Item emptyItem = item.getEmptyItem(stack);
 					int chargedItemID = Item.getIdFromItem(item.getChargedItem(stack));
 
-					if (Item.getIdFromItem(stack.getItem()) == chargedItemID)
-					{
-						int transferLimit = item.getTransferLimit(stack);
+					if (Item.getIdFromItem(stack.getItem()) == chargedItemID){
+						double transferLimit = item.getTransferLimit(stack);
 						//int amountNeeded = baseMaxOutput - currentEnergy;
 						if (transferLimit == 0) transferLimit = packetSize;
 						//if (transferLimit > amountNeeded) transferLimit = amountNeeded;
 
-						int chargeReturned = ElectricItem.manager.discharge(stack, transferLimit, powerTier, false, false);
-						if (chargeReturned > 0)
-						{
+						double chargeReturned = ElectricItem.manager.discharge(stack, transferLimit, powerTier, false, false, false);
+						if (chargeReturned > 0){
 							// Add the energy we received to our current energy level
 							currentEnergy += chargeReturned;
 							doingWork = true;
 						}
 
 						// Workaround for buggy IC2 API .discharge that automatically switches stack to emptyItemID but leaves a stackTagCompound on it, so it can't be stacked with never-used empties  
-						if (chargedItemID != Item.getIdFromItem(emptyItem) && (chargeReturned < transferLimit || ElectricItem.manager.discharge(stack, 1, powerTier, false, true) == 0))
-						{
+						if (chargedItemID != Item.getIdFromItem(emptyItem) && (chargeReturned < transferLimit || ElectricItem.manager.discharge(stack, 1, powerTier, false, true, false) == 0)){
 							//if (ChargingBench.isDebugging) System.out.println("Switching to emptyItemID: " + emptyItemID + " from stack.itemID: " + stack.itemID + " - chargedItemID: " + chargedItemID);
 							setInventorySlotContents(i, new ItemStack(emptyItem, 1, 0));
 						}
@@ -343,7 +339,7 @@ public class TEBatteryStation extends TECommonBench implements IEnergySource, II
 						}
 						else if (outputStack == null)
 						{
-							boolean empty = ElectricItem.manager.discharge(currentStack, 1, powerTier, true, true) == 0;
+							boolean empty = ElectricItem.manager.discharge(currentStack, 1, powerTier, true, true, false) == 0;
 							if (empty)
 							{
 								// Pick Me
@@ -438,7 +434,7 @@ public class TEBatteryStation extends TECommonBench implements IEnergySource, II
 				final IElectricItem item = (IElectricItem)(stack.getItem());
 				if (item.getTier(stack) <= powerTier && item.canProvideEnergy(stack) && Item.getIdFromItem(stack.getItem()) == Item.getIdFromItem(item.getChargedItem(stack)))
 				{
-					final int chargeReturned = ElectricItem.manager.discharge(stack, Integer.MAX_VALUE, powerTier, true, true);
+					final double chargeReturned = ElectricItem.manager.discharge(stack, Integer.MAX_VALUE, powerTier, true, true, false);
 					if (chargeReturned > 0)
 					{
 						// Add the energy we received to our current energy level
@@ -459,15 +455,13 @@ public class TEBatteryStation extends TECommonBench implements IEnergySource, II
 	}
 	
 	@Override
-	protected void addUniqueDescriptionData(ByteBuf data) throws IOException
-	{
+	protected void addUniqueDescriptionData(ByteBuf data) throws IOException{
 		data.writeBoolean(doingWork);
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void receiveDescriptionData(int packetID, ByteBuf stream)
-	{
+	public void receiveDescriptionData(int packetID, ByteBuf stream){
 		boolean b = doingWork;
 		//try
 		//{
@@ -538,8 +532,7 @@ public class TEBatteryStation extends TECommonBench implements IEnergySource, II
 
 	// Returns true if automation can extract the given item in the given slot from the given side. Args: Slot, item, side
 	@Override
-	public boolean canExtractItem(int i, ItemStack itemstack, int j) // canExtractItem
-	{
+	public boolean canExtractItem(int i, ItemStack itemstack, int j){ // canExtractItem
 		if (i == Info.BS_SLOT_OUTPUT) return true;
 		return false;
 	}
@@ -547,17 +540,14 @@ public class TEBatteryStation extends TECommonBench implements IEnergySource, II
 	// IInventory
 
 	@Override
-	public int getSizeInventory()
-	{
+	public int getSizeInventory(){
 		// Only input/output slots are accessible to machines
 		return 2;
 	}
 
 	@Override
-	public String getInventoryName()
-	{
-		switch (baseTier)
-		{
+	public String getInventoryName(){
+		switch (baseTier){
 		case 1:
 			return Info.KEY_BLOCK_NAMES[8] + Info.KEY_NAME_SUFFIX;
 		case 2:
@@ -569,10 +559,8 @@ public class TEBatteryStation extends TECommonBench implements IEnergySource, II
 	}
 
 	@Override
-	public void markDirty(int slot)
-	{
-		if (slot == Info.BS_SLOT_INPUT || slot == Info.BS_SLOT_OUTPUT)
-		{
+	public void markDirty(int slot){
+		if (slot == Info.BS_SLOT_INPUT || slot == Info.BS_SLOT_OUTPUT){
 			rejectInvalidInput();
 		}
 		super.markDirty();

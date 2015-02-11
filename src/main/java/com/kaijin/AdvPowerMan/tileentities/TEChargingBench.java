@@ -151,8 +151,7 @@ public class TEChargingBench extends TECommonBench implements IEnergySink, IEner
 	}
 
 	@Override
-	public int getMaxSafeInput()
-	{
+	public int getSinkTier() {
 		return adjustedMaxInput;
 	}
 
@@ -414,7 +413,7 @@ public class TEChargingBench extends TECommonBench implements IEnergySink, IEner
 	 */
 	private void drainPowerSource()
 	{
-		int chargeReturned = 0;
+		double chargeReturned = 0;
 
 		ItemStack stack = getStackInSlot(Info.CB_SLOT_POWER_SOURCE);
 		if (stack != null && stack.getItem() instanceof IElectricItem && currentEnergy < adjustedStorage)
@@ -428,8 +427,8 @@ public class TEChargingBench extends TECommonBench implements IEnergySink, IEner
 			{
 				if (powerSource.getTier(stack) <= powerTier && powerSource.canProvideEnergy(stack))
 				{
-					int itemTransferLimit = powerSource.getTransferLimit(stack);
-					int energyNeeded = adjustedStorage - currentEnergy;
+					double itemTransferLimit = powerSource.getTransferLimit(stack);
+					double energyNeeded = adjustedStorage - currentEnergy;
 
 					// Test if the amount of energy we have room for is greater than what the item can transfer per tick.
 					if (energyNeeded > itemTransferLimit)
@@ -441,7 +440,7 @@ public class TEChargingBench extends TECommonBench implements IEnergySink, IEner
 
 					if (energyNeeded > 0)
 					{
-						chargeReturned = ElectricItem.manager.discharge(stack, energyNeeded, powerTier, false, false);
+						chargeReturned = ElectricItem.manager.discharge(stack, energyNeeded, powerTier, false, false, false);
 						// Add the energy we received to our current energy level,
 						currentEnergy += chargeReturned;
 						if (chargeReturned > 0) doingWork = true;
@@ -451,8 +450,7 @@ public class TEChargingBench extends TECommonBench implements IEnergySink, IEner
 				}
 
 				// Workaround for buggy IC2 API .discharge that automatically switches stack to emptyItemID but leaves a stackTagCompound on it, so it can't be stacked with never-used empties  
-				if (chargedItemID != Item.getIdFromItem(emptyItem) && ElectricItem.manager.discharge(stack, 1, powerTier, false, true) == 0)
-				{
+				if (chargedItemID != Item.getIdFromItem(emptyItem) && ElectricItem.manager.discharge(stack, 1, powerTier, false, true, true) == 0){
 					//if (ChargingBench.isDebugging) System.out.println("Switching to emptyItemID: " + emptyItemID + " from stack.itemID: " + stack.itemID + " - chargedItemID: " + chargedItemID);
 					setInventorySlotContents(Info.CB_SLOT_POWER_SOURCE, new ItemStack(emptyItem, 1, 0));
 					//ItemStack newStack = new ItemStack(emptyItemID, 1, 0);
@@ -470,41 +468,31 @@ public class TEChargingBench extends TECommonBench implements IEnergySink, IEner
 	 * item. Continue doing this for all items in the inventory until we reach the end of the main
 	 * inventory or run out of internal EU storage.
 	 */
-	private void chargeItems()
-	{
-		for (int i = Info.CB_SLOT_CHARGING; i < Info.CB_SLOT_CHARGING + 12; i++)
-		{
+	private void chargeItems(){
+		for (int i = Info.CB_SLOT_CHARGING; i < Info.CB_SLOT_CHARGING + 12; i++){
 			ItemStack stack = contents[i];
-			if (stack != null && stack.getItem() instanceof IElectricItem && stack.stackSize == 1)
-			{
+			if (stack != null && stack.getItem() instanceof IElectricItem && stack.stackSize == 1){
 				IElectricItem item = (IElectricItem)(stack.getItem());
-				if (item.getTier(stack) <= baseTier)
-				{
-					int itemTransferLimit = item.getTransferLimit(stack);
+				if (item.getTier(stack) <= baseTier){
+					double itemTransferLimit = item.getTransferLimit(stack);
 					if (itemTransferLimit == 0) itemTransferLimit = baseMaxInput;
 					int adjustedTransferLimit = (int)Math.ceil(chargeFactor * itemTransferLimit);
-					int amountNeeded;
-					int missing;
+					double amountNeeded;
+					double missing;
 					int consumption;
-					if (Item.getIdFromItem(item.getChargedItem(stack)) != Item.getIdFromItem(item.getEmptyItem(stack)) || stack.isStackable())
-					{
+					if (Item.getIdFromItem(item.getChargedItem(stack)) != Item.getIdFromItem(item.getEmptyItem(stack)) || stack.isStackable()){
 						// Running stack.copy() on every item every tick would be a horrible thing for performance, but the workaround is needed
 						// for ElectricItem.charge adding stackTagCompounds for charge level to EmptyItemID batteries even when run in simulate mode.
 						// Limiting its use by what is hopefully a broad enough test to catch all cases where it's necessary in order to avoid problems.
 						// Using it for any item types listed as stackable and for any items where the charged and empty item IDs differ.
 						final ItemStack stackCopy = stack.copy();
 						amountNeeded = ElectricItem.manager.charge(stackCopy, adjustedTransferLimit, baseTier, true, true);
-						if (amountNeeded == adjustedTransferLimit)
-						{
+						if (amountNeeded == adjustedTransferLimit){
 							missing = ElectricItem.manager.charge(stackCopy, item.getMaxCharge(stackCopy), baseTier, true, true);
-						}
-						else missing = amountNeeded;
-					}
-					else
-					{
+						}else missing = amountNeeded;
+					}else{
 						amountNeeded = ElectricItem.manager.charge(stack, adjustedTransferLimit, baseTier, true, true);
-						if (amountNeeded == adjustedTransferLimit)
-						{
+						if (amountNeeded == adjustedTransferLimit){
 							missing = ElectricItem.manager.charge(stack, item.getMaxCharge(stack), baseTier, true, true);
 						}
 						else missing = amountNeeded;
@@ -516,10 +504,8 @@ public class TEChargingBench extends TECommonBench implements IEnergySink, IEner
 					energyRequired += (int)Math.ceil((drainFactor / chargeFactor) * missing);
 
 					int adjustedEnergyUse = (int)Math.ceil((drainFactor / chargeFactor) * amountNeeded);
-					if (adjustedEnergyUse > 0 && currentEnergy > 0)
-					{
-						if (adjustedEnergyUse > currentEnergy)
-						{
+					if (adjustedEnergyUse > 0 && currentEnergy > 0){
+						if (adjustedEnergyUse > currentEnergy){
 							// Allow that last trickle of energy to be transferred out of the bench 
 							adjustedTransferLimit = (adjustedTransferLimit * currentEnergy) / adjustedEnergyUse;
 							adjustedEnergyUse = currentEnergy;
@@ -717,10 +703,8 @@ public class TEChargingBench extends TECommonBench implements IEnergySink, IEner
 	}
 
 	@Override
-	public String getInventoryName()
-	{
-		switch (baseTier)
-		{
+	public String getInventoryName(){
+		switch (baseTier){
 		case 1:
 			return Info.KEY_BLOCK_NAMES[0] + Info.KEY_NAME_SUFFIX;
 		case 2:
@@ -732,32 +716,22 @@ public class TEChargingBench extends TECommonBench implements IEnergySink, IEner
 	}
 
 	@Override
-	public void markDirty(int slot)
-	{
-		if (slot == Info.CB_SLOT_INPUT || slot == Info.CB_SLOT_OUTPUT)
-		{
+	public void markDirty(int slot){
+		if (slot == Info.CB_SLOT_INPUT || slot == Info.CB_SLOT_OUTPUT){
 			// Move item from input to output if not valid. (Wrong tier or not electric item.)
-			if (contents[Info.CB_SLOT_INPUT] != null && contents[Info.CB_SLOT_OUTPUT] == null)
-			{
-				if (!isItemValid(Info.CB_SLOT_INPUT, contents[Info.CB_SLOT_INPUT]))
-				{
+			if (contents[Info.CB_SLOT_INPUT] != null && contents[Info.CB_SLOT_OUTPUT] == null){
+				if (!isItemValid(Info.CB_SLOT_INPUT, contents[Info.CB_SLOT_INPUT])){
 					contents[Info.CB_SLOT_OUTPUT] = contents[Info.CB_SLOT_INPUT];
 					contents[Info.CB_SLOT_INPUT] = null;
 				}
 			}
-		}
-		else if (slot >= Info.CB_SLOT_UPGRADE && slot < Info.CB_SLOT_UPGRADE + 4)
-		{
+		}else if (slot >= Info.CB_SLOT_UPGRADE && slot < Info.CB_SLOT_UPGRADE + 4){
 			// One of the upgrade slots was touched, so we need to recalculate.
 			doUpgradeEffects();
-		}
-		else if (slot >= Info.CB_SLOT_CHARGING && slot < Info.CB_SLOT_CHARGING + 12)
-		{
+		}else if (slot >= Info.CB_SLOT_CHARGING && slot < Info.CB_SLOT_CHARGING + 12){
 			// Make sure it's not fully charged already? Not sure, full items will be output in updateEntity
 
-		}
-		else if (slot == Info.CB_SLOT_POWER_SOURCE)
-		{
+		}else if (slot == Info.CB_SLOT_POWER_SOURCE){
 			// Perhaps eject the item if it's not valid? No, just leave it alone. 
 			// If machinery added it the player can figure out the problem by trying to remove and replace it and realizing it won't fit.
 		}
@@ -765,8 +739,7 @@ public class TEChargingBench extends TECommonBench implements IEnergySink, IEner
 	}
 
 	@Override
-	public void markDirty()
-	{
+	public void markDirty(){
 		// We're not sure what called this or what slot was altered, so make sure the upgrade effects are correct just in case and then pass the call on.
 		doUpgradeEffects();
 		super.markDirty();
@@ -788,23 +761,20 @@ public class TEChargingBench extends TECommonBench implements IEnergySink, IEner
 	}
 
 	@Override
-	public double demandedEnergyUnits() {
+	public double getDemandedEnergy() {
 		//		return (currentEnergy < adjustedStorage && !receivingRedstoneSignal());
-		if(!receivingRedstoneSignal())
-		{
+		if(!receivingRedstoneSignal()){
 			return adjustedStorage - currentEnergy;
 		}
 		return 0;
 	}
 
 	@Override
-	public double injectEnergyUnits(ForgeDirection directionFrom, double amount) {
+	public double injectEnergy(ForgeDirection directionFrom, double amount, double voltage) {
 		int surplus = 0;
-		if (AdvancedPowerManagement.proxy.isServer())
-		{
+		if (AdvancedPowerManagement.proxy.isServer()){
 			// if supply is greater than the max we can take per tick
-			if (amount > adjustedMaxInput)
-			{
+			if (amount > adjustedMaxInput){
 				//If the supplied EU is over the baseMaxInput, we're getting
 				//supplied higher than acceptable current. Pop ourselves off
 				//into the world and return all but 1 EU, or if the supply
@@ -815,15 +785,12 @@ public class TEChargingBench extends TECommonBench implements IEnergySink, IEner
 					return 0;
 				else
 					return amount - 1;
-			}
-			else
-			{
+			}else{
 				if (currentEnergy > adjustedStorage) currentEnergy = adjustedStorage;
 				currentEnergy += amount;
 				energyReceived += amount;
 				// check if our current energy level is now over the max energy level
-				if (currentEnergy > adjustedStorage)
-				{
+				if (currentEnergy > adjustedStorage){
 					//if so, our surplus to return is equal to that amount over
 					surplus = currentEnergy - adjustedStorage;
 					//and set our current energy level TO our max energy level
