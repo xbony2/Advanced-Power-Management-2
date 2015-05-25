@@ -10,31 +10,27 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 
-public class SlotMachineUpgrade extends SlotCustom
-{
-	public SlotMachineUpgrade(IInventory inv, int index, int xpos, int ypos)
-	{
+public class SlotMachineUpgrade extends SlotCustom{
+	public SlotMachineUpgrade(IInventory inv, int index, int xpos, int ypos) {
 		super(inv, index, xpos, ypos);
 	}
-
-    /**
-     * Check if the stack is a valid item for this slot.
-     */
+	
+	/**
+	 * Check if the stack is a valid item for this slot.
+	 */
 	@Override
-    public boolean isItemValid(ItemStack stack)
-    {
-    	// Decide if the item is a valid IC2 machine upgrade 
-    	if (stack == null) return false;
-    	if (stack.isItemEqual(Info.ic2overclockerUpg) || stack.isItemEqual(Info.ic2transformerUpg) || stack.isItemEqual(Info.ic2storageUpg))
-    	{
-    		return true;
-    	}
-        return false; 
-    }
-
+	public boolean isItemValid(ItemStack stack){
+		// Decide if the item is a valid IC2 machine upgrade
+		if(stack == null)
+			return false;
+		if(stack.isItemEqual(Info.ic2overclockerUpg) || stack.isItemEqual(Info.ic2transformerUpg) || stack.isItemEqual(Info.ic2storageUpg)){
+			return true;
+		}
+		return false;
+	}
+	
 	@Override
-	public IIcon getBackgroundIconIndex()
-	{
+	public IIcon getBackgroundIconIndex(){
 		return Info.iconSlotMachineUpgrade;
 		// return 245;
 	}

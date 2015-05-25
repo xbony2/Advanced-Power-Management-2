@@ -12,164 +12,141 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 
-public abstract class TECommonBench extends TECommon implements IInventory
-{
+public abstract class TECommonBench extends TECommon implements IInventory{
 	protected ItemStack[] contents;
-
+	
 	protected boolean initialized = false;
-
+	
 	public int baseTier;
-	public int powerTier; // Transformer upgrades allow charging from energy crystals and lapotrons
-
-	//For outside texture display
+	public int powerTier; // Transformer upgrades allow charging from energy
+							// crystals and lapotrons
+	
+	// For outside texture display
 	public boolean doingWork;
-
-	public boolean receivingRedstoneSignal()
-	{
+	
+	public boolean receivingRedstoneSignal(){
 		return worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord);
 	}
-
+	
 	@Override
-	public void invalidate()
-	{
-		if (worldObj != null && initialized)
-		{
-			EnergyTileUnloadEvent unloadEvent = new EnergyTileUnloadEvent((IEnergyTile)this);
+	public void invalidate(){
+		if(worldObj != null && initialized){
+			EnergyTileUnloadEvent unloadEvent = new EnergyTileUnloadEvent((IEnergyTile) this);
 			MinecraftForge.EVENT_BUS.post(unloadEvent);
 		}
 		super.invalidate();
 	}
-
+	
 	// Common IC2 API function
-	public boolean isAddedToEnergyNet()
-	{
+	public boolean isAddedToEnergyNet(){
 		return initialized;
 	}
-
+	
 	/**
-	 * This will cause the block to drop anything inside it, create a new item in the
-	 * world of its type, invalidate the tile entity, remove itself from the IC2
-	 * EnergyNet and clear the block space (set it to air)
+	 * This will cause the block to drop anything inside it, create a new item
+	 * in the world of its type, invalidate the tile entity, remove itself from
+	 * the IC2 EnergyNet and clear the block space (set it to air)
 	 */
 	protected abstract void selfDestroy();
-
-	public void dropItem(ItemStack item)
-	{
-		EntityItem entityitem = new EntityItem(worldObj, (double)xCoord + 0.5D, (double)yCoord + 0.5D, (double)zCoord + 0.5D, item);
+	
+	public void dropItem(ItemStack item){
+		EntityItem entityitem = new EntityItem(worldObj, (double) xCoord + 0.5D, (double) yCoord + 0.5D, (double) zCoord + 0.5D, item);
 		entityitem.delayBeforeCanPickup = 10;
 		worldObj.spawnEntityInWorld(entityitem);
 	}
-
+	
 	@Override
-	public void dropContents()
-	{
+	public void dropContents(){
 		ItemStack item;
-		for (int i = 0; i < contents.length; ++i)
-		{
+		for(int i = 0; i < contents.length; ++i){
 			item = contents[i];
 			contents[i] = null;
-			if (item != null && item.stackSize > 0) dropItem(item);
+			if(item != null && item.stackSize > 0)
+				dropItem(item);
 		}
 	}
-
-    public abstract int getSizeInventory();
-
+	
+	public abstract int getSizeInventory();
+	
 	@Override
-	public ItemStack getStackInSlot(int i)
-	{
+	public ItemStack getStackInSlot(int i){
 		return contents[i];
 	}
-
+	
 	@Override
-	public ItemStack decrStackSize(int slot, int amount)
-	{
-		if (this.contents[slot] != null)
-		{
+	public ItemStack decrStackSize(int slot, int amount){
+		if(this.contents[slot] != null){
 			ItemStack output;
-
-			if (this.contents[slot].stackSize <= amount)
-			{
+			
+			if(this.contents[slot].stackSize <= amount){
 				output = this.contents[slot];
 				this.contents[slot] = null;
 				this.markDirty(slot);
 				return output;
-			}
-			else
-			{
+			}else{
 				output = this.contents[slot].splitStack(amount);
-
-				if (this.contents[slot].stackSize <= 0)
-				{
+				
+				if(this.contents[slot].stackSize <= 0){
 					this.contents[slot] = null;
 				}
 				this.markDirty(slot);
 				return output;
 			}
-		}
-		else
-		{
+		}else{
 			return null;
 		}
 	}
-
+	
 	@Override
-	public ItemStack getStackInSlotOnClosing(int slot)
-	{
-		if (this.contents[slot] == null)
-		{
+	public ItemStack getStackInSlotOnClosing(int slot){
+		if(this.contents[slot] == null){
 			return null;
 		}
-
+		
 		ItemStack stack = this.contents[slot];
 		this.contents[slot] = null;
 		return stack;
 	}
-
+	
 	@Override
-	public void setInventorySlotContents(int slot, ItemStack itemstack)
-	{
+	public void setInventorySlotContents(int slot, ItemStack itemstack){
 		this.contents[slot] = itemstack;
-
-		if (itemstack != null && itemstack.stackSize > getInventoryStackLimit())
-		{
+		
+		if(itemstack != null && itemstack.stackSize > getInventoryStackLimit()){
 			itemstack.stackSize = getInventoryStackLimit();
 		}
 		this.markDirty(slot);
 	}
 	
-    /**
-     * Returns the name of the inventory.
-     */
+	/**
+	 * Returns the name of the inventory.
+	 */
 	@Override
-    public abstract String getInventoryName();
-
+	public abstract String getInventoryName();
+	
 	@Override
-	public boolean hasCustomInventoryName()
-	{
+	public boolean hasCustomInventoryName(){
 		return false;
 	}
-
+	
 	@Override
-	public int getInventoryStackLimit()
-	{
+	public int getInventoryStackLimit(){
 		return 64;
 	}
-
+	
 	@Override
-	public boolean isUseableByPlayer(EntityPlayer entityplayer)
-	{
-		if (worldObj.getTileEntity(xCoord, yCoord, zCoord) != this)
-		{
+	public boolean isUseableByPlayer(EntityPlayer entityplayer){
+		if(worldObj.getTileEntity(xCoord, yCoord, zCoord) != this){
 			return false;
 		}
-
-		return entityplayer.getDistanceSq((double)xCoord + 0.5D, (double)yCoord + 0.5D, (double)zCoord + 0.5D) <= 64D;
+		
+		return entityplayer.getDistanceSq((double) xCoord + 0.5D, (double) yCoord + 0.5D, (double) zCoord + 0.5D) <= 64D;
 	}
-
+	
 	@Override
-	public void openInventory() {}
-
+	public void openInventory(){}
+	
 	@Override
-	public void closeInventory() {}
-
+	public void closeInventory(){}
+	
 }

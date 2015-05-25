@@ -11,35 +11,30 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 
-public class SlotDrainable extends SlotCustom
-{
+public class SlotDrainable extends SlotCustom{
 	protected int powerTier;
-
-	public SlotDrainable(IInventory inv, int index, int xpos, int ypos, int tier)
-	{
+	
+	public SlotDrainable(IInventory inv, int index, int xpos, int ypos, int tier) {
 		super(inv, index, xpos, ypos);
 		powerTier = tier;
 	}
-
+	
 	/**
 	 * Check if the stack is a valid item for this slot.
 	 */
 	@Override
-	public boolean isItemValid(ItemStack stack)
-	{
+	public boolean isItemValid(ItemStack stack){
 		// Decide if the item is a valid IC2 power source
 		return Utils.isItemDrainable(stack, powerTier);
 	}
-
+	
 	@Override
-	public int getSlotStackLimit()
-	{
+	public int getSlotStackLimit(){
 		return 1;
 	}
-
+	
 	@Override
-	public IIcon getBackgroundIconIndex()
-	{
+	public IIcon getBackgroundIconIndex(){
 		return Info.iconSlotDrainable;
 		// return -1; // 232;
 	}

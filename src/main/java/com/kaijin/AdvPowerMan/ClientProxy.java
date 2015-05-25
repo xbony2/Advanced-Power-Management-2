@@ -21,21 +21,18 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
 
-public class ClientProxy extends CommonProxy
-{
-
-	public static EntityPlayer getPlayer() 
-	{	
+public class ClientProxy extends CommonProxy{
+	
+	public static EntityPlayer getPlayer(){
 		return Minecraft.getMinecraft().thePlayer;
 	}
-	/*	@Override
-	public void load()
-	{
-		// MinecraftForgeClient.preloadTexture(Info.ITEM_PNG);
-		// MinecraftForgeClient.preloadTexture(Info.BLOCK_PNG);
-		// MinecraftForgeClient.preloadTexture(Info.GUI1_PNG);
-		// MinecraftForgeClient.preloadTexture(Info.GUI2_PNG);
-		// MinecraftForgeClient.preloadTexture(Info.GUI3_PNG);
-		// MinecraftForgeClient.preloadTexture(Info.GUI4_PNG);
-	}*/
+	/*
+	 * @Override public void load() { //
+	 * MinecraftForgeClient.preloadTexture(Info.ITEM_PNG); //
+	 * MinecraftForgeClient.preloadTexture(Info.BLOCK_PNG); //
+	 * MinecraftForgeClient.preloadTexture(Info.GUI1_PNG); //
+	 * MinecraftForgeClient.preloadTexture(Info.GUI2_PNG); //
+	 * MinecraftForgeClient.preloadTexture(Info.GUI3_PNG); //
+	 * MinecraftForgeClient.preloadTexture(Info.GUI4_PNG); }
+	 */
 }

@@ -4,35 +4,31 @@
  ******************************************************************************/
 package com.kaijin.AdvPowerMan.items;
 
-
 import com.kaijin.AdvPowerMan.Info;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
-public class ItemBlockAdvPwrMan extends ItemBlock
-{
-	public ItemBlockAdvPwrMan(Block block)
-	{
+public class ItemBlockAdvPwrMan extends ItemBlock{
+	public ItemBlockAdvPwrMan(Block block) {
 		super(block);
 		this.setMaxDamage(0);
 		this.setHasSubtypes(true);
 	}
-
-	public int getMetadata(int meta)
-	{
-		//if (meta >= 3 && meta <= 6) return 7;
+	
+	public int getMetadata(int meta){
+		// if (meta >= 3 && meta <= 6) return 7;
 		return meta;
 	}
-
+	
 	@Override
-	public String getUnlocalizedName(ItemStack var1)
-	{
+	public String getUnlocalizedName(ItemStack var1){
 		int var2 = var1.getItemDamage();
-
-		if (var2 >= 0 && var2 <= Info.LAST_META_VALUE) return Info.KEY_BLOCK_NAMES[var2];
-
+		
+		if(var2 >= 0 && var2 <= Info.LAST_META_VALUE)
+			return Info.KEY_BLOCK_NAMES[var2];
+		
 		return null;
 	}
 }

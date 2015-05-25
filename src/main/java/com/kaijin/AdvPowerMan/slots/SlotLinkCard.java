@@ -13,49 +13,39 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 
-public class SlotLinkCard extends Slot
-{
-	public SlotLinkCard(IInventory inv, int index, int xpos, int ypos)
-	{
+public class SlotLinkCard extends Slot{
+	public SlotLinkCard(IInventory inv, int index, int xpos, int ypos) {
 		super(inv, index, xpos, ypos);
 	}
-
+	
 	/**
 	 * Check if the stack is a valid item for this slot.
 	 */
 	@Override
-	public boolean isItemValid(ItemStack stack)
-	{
+	public boolean isItemValid(ItemStack stack){
 		// Decide if the item is a link card
-		if (stack != null && stack.getItem() instanceof ItemStorageLinkCard)
-		{
+		if(stack != null && stack.getItem() instanceof ItemStorageLinkCard){
 			return true;
 		}
 		return false;
 	}
-
+	
 	@Override
-	public int getSlotStackLimit()
-	{
+	public int getSlotStackLimit(){
 		return 1;
 	}
-
+	
 	@Override
-	public IIcon getBackgroundIconIndex()
-	{
+	public IIcon getBackgroundIconIndex(){
 		return Info.iconSlotLinkCard;
 		// return 246;
 	}
-
+	
 	@Override
-	public void onSlotChanged()
-	{
-		if (this.inventory instanceof TECommon)
-		{
-			((TECommon)inventory).markDirty(this.getSlotIndex());
-		}
-		else
-		{
+	public void onSlotChanged(){
+		if(this.inventory instanceof TECommon){
+			((TECommon) inventory).markDirty(this.getSlotIndex());
+		}else{
 			inventory.markDirty();
 		}
 	}

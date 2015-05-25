@@ -10,26 +10,22 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 
-public class SlotOutput extends SlotCustom
-{
-	public SlotOutput(IInventory inv, int index, int xpos, int ypos)
-	{
+public class SlotOutput extends SlotCustom{
+	public SlotOutput(IInventory inv, int index, int xpos, int ypos) {
 		super(inv, index, xpos, ypos);
 	}
-
+	
 	/**
 	 * Check if the stack is a valid item for this slot.
 	 */
 	@Override
-	public boolean isItemValid(ItemStack stack)
-	{
-		// No items may be placed here, parameter is ignored 
-		return false; 
+	public boolean isItemValid(ItemStack stack){
+		// No items may be placed here, parameter is ignored
+		return false;
 	}
-
+	
 	@Override
-	public IIcon getBackgroundIconIndex()
-	{
+	public IIcon getBackgroundIconIndex(){
 		return Info.iconSlotOutput;
 		// return -1; // 250
 	}
