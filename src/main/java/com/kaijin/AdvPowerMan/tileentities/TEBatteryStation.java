@@ -4,22 +4,17 @@
  ******************************************************************************/
 package com.kaijin.AdvPowerMan.tileentities;
 
-import ic2.api.Direction;
-import ic2.api.item.ElectricItem;
-import ic2.api.item.IElectricItem;
-import ic2.api.energy.event.EnergyTileLoadEvent;
-import ic2.api.energy.tile.IEnergySource;
-import io.netty.buffer.ByteBuf;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 import com.kaijin.AdvPowerMan.AdvancedPowerManagement;
 import com.kaijin.AdvPowerMan.Info;
 import com.kaijin.AdvPowerMan.MovingAverage;
 import com.kaijin.AdvPowerMan.Utils;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import ic2.api.energy.event.EnergyTileLoadEvent;
+import ic2.api.energy.tile.IEnergySource;
+import ic2.api.item.ElectricItem;
+import ic2.api.item.IElectricItem;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
@@ -27,13 +22,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.Packet;
-import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.Constants;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import java.io.IOException;
 
 public class TEBatteryStation extends TECommonBench implements IEnergySource, IInventory, ISidedInventory{
 	public int opMode;
@@ -55,17 +49,13 @@ public class TEBatteryStation extends TECommonBench implements IEnergySource, II
 	private static final int[] BatteryStationSideOutput = {Info.BS_SLOT_OUTPUT};
 	private static final int[] BatteryStationSideInOut = {Info.BS_SLOT_INPUT, Info.BS_SLOT_OUTPUT};
 	
-	public TEBatteryStation() // Default constructor used only when loading tile
-								// entity from world save
-	{
+	public TEBatteryStation(){ // Default constructor used only when loading tile entity from world save
 		super();
 		// Do nothing else; Creating the inventory array and loading previous
 		// values will be handled in NBT read method momentarily.
 	}
 	
-	public TEBatteryStation(int i) // Constructor used when placing a new tile
-									// entity, to set up correct parameters
-	{
+	public TEBatteryStation(int i){ // Constructor used when placing a new tile entity, to set up correct parameters
 		super();
 		contents = new ItemStack[14];
 		
@@ -105,7 +95,7 @@ public class TEBatteryStation extends TECommonBench implements IEnergySource, II
 	
 	@Override
 	public int getSourceTier(){
-		return 4; // XXX: cause I dunno what to put...
+		return 4; // XXX: cause I dunno what to put... / READ THE JAVADOC YOU NOOB - xbony2
 	}
 	
 	// End IC2 API
@@ -232,8 +222,7 @@ public class TEBatteryStation extends TECommonBench implements IEnergySource, II
 		acceptInputItems();
 		
 		if(invChanged){
-			this.markDirty(); // This doesn't need to be called multiple times,
-								// so it gets flagged to happen here if needed.
+			this.markDirty(); // This doesn't need to be called multiple times, so it gets flagged to happen here if needed.
 		}
 		
 		// Trigger this only when it would need to update the client texture
@@ -245,12 +234,13 @@ public class TEBatteryStation extends TECommonBench implements IEnergySource, II
 		}
 	}
 	
+	/**
+	 * This method is constantly called, wether something is in it or not.
+	 * It checks that stuff automatically, assuming it isn't powered by redstone.
+	 */
 	private void drainPowerSource(){
 		hasEnoughItems = false;
 		for(int i = Info.BS_SLOT_POWER_START; i < Info.BS_SLOT_POWER_START + 12; i++){
-			// if (ChargingBench.isDebugging)
-			// System.out.println("currentEnergy: " + currentEnergy +
-			// " baseMaxOutput: " + baseMaxOutput);
 			if(currentEnergy >= packetSize){
 				hasEnoughItems = true;
 				break;
@@ -258,12 +248,12 @@ public class TEBatteryStation extends TECommonBench implements IEnergySource, II
 			
 			ItemStack stack = contents[i];
 			if(stack != null && stack.getItem() instanceof IElectricItem && stack.stackSize == 1){
-				IElectricItem item = (IElectricItem) (stack.getItem());
+				IElectricItem item = (IElectricItem) stack.getItem();
 				if(item.getTier(stack) <= powerTier && item.canProvideEnergy(stack)){
+					//System.out.println("Do we even get here?"); we do -xbony2
 					Item emptyItem = item.getEmptyItem(stack);
-					int chargedItemID = Item.getIdFromItem(item.getChargedItem(stack));
-					
-					if(Item.getIdFromItem(stack.getItem()) == chargedItemID){
+					//Funfact: nobody use ids anymore.
+					if(true/*stack.getItem() == item.getChargedItem(stack)*/){ // this doesn't work, but who cares?
 						double transferLimit = item.getTransferLimit(stack);
 						// int amountNeeded = baseMaxOutput - currentEnergy;
 						if(transferLimit == 0)
@@ -272,18 +262,23 @@ public class TEBatteryStation extends TECommonBench implements IEnergySource, II
 						// amountNeeded;
 						
 						double chargeReturned = ElectricItem.manager.discharge(stack, transferLimit, powerTier, false, false, false);
+						//^hold up... if it discharges it, why would it return anything but zero?
+						System.out.println(chargeReturned);
 						if(chargeReturned > 0){
+							System.out.println("THIS *SHOULD* BE WORKING");
 							// Add the energy we received to our current energy
 							// level
 							currentEnergy += chargeReturned;
 							doingWork = true;
+						}else{
+							System.out.println("BROKEN SHIT GOIN' ON RIGHT HERE RIGHT NOW");
 						}
 						
 						// Workaround for buggy IC2 API .discharge that
 						// automatically switches stack to emptyItemID but
 						// leaves a stackTagCompound on it, so it can't be
 						// stacked with never-used empties
-						if(chargedItemID != Item.getIdFromItem(emptyItem)
+						if(item.getChargedItem(stack) != emptyItem
 								&& (chargeReturned < transferLimit || ElectricItem.manager.discharge(stack, 1, powerTier, false, true, false) == 0)){
 							// if (ChargingBench.isDebugging)
 							// System.out.println("Switching to emptyItemID: " +
