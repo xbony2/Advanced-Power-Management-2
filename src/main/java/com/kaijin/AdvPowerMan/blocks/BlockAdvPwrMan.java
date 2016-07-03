@@ -278,19 +278,19 @@ public class BlockAdvPwrMan extends BlockContainer{
 			return new TEChargingBench(1);
 			
 		case 1:
-			return new TEChargingBench(2);
+			return new TEChargingBench(3);
 			
 		case 2:
-			return new TEChargingBench(3);
+			return new TEChargingBench(4);
 			
 		case 3:
 			return new TEAdvEmitter(1); // Update old emitter tier 1
 			
 		case 4:
-			return new TEAdvEmitter(2); // Update old emitter tier 2
+			return new TEAdvEmitter(3); // Update old emitter tier 2
 			
 		case 5:
-			return new TEAdvEmitter(3); // Update old emitter tier 3
+			return new TEAdvEmitter(4); // Update old emitter tier 3
 			
 		case 6:
 			return new TEAdjustableTransformer();
@@ -302,10 +302,10 @@ public class BlockAdvPwrMan extends BlockContainer{
 			return new TEBatteryStation(1);
 			
 		case 9:
-			return new TEBatteryStation(2);
+			return new TEBatteryStation(3);
 			
 		case 10:
-			return new TEBatteryStation(3);
+			return new TEBatteryStation(4);
 			
 		case 11:
 			return new TEStorageMonitor();
