@@ -13,3 +13,7 @@ hs_err_pid*
 
 #OS X
 .DS_Store
+
+#Gradle
+!gradle/wrapper/gradle-wrapper.jar
+/.gradle/
