@@ -8,8 +8,10 @@ import com.kaijin.AdvPowerMan.AdvancedPowerManagement;
 import com.kaijin.AdvPowerMan.Info;
 import com.kaijin.AdvPowerMan.MovingAverage;
 import com.kaijin.AdvPowerMan.Utils;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import ic2.api.energy.EnergyNet;
 import ic2.api.energy.event.EnergyTileLoadEvent;
 import ic2.api.energy.tile.IEnergySource;
 import ic2.api.item.ElectricItem;
@@ -68,7 +70,7 @@ public class TEBatteryStation extends TECommonBench implements IEnergySource, II
 	private void initializeValues(){
 		powerTier = baseTier;
 		// Output math = 32 for tier 1, 128 for tier 2, 512 for tier 3
-		packetSize = (int) Math.pow(2.0D, (double) (2 * baseTier + 3));
+		packetSize = (int) Math.pow(2.0D, EnergyNet.instance.getPowerFromTier(powerTier));
 		
 	}
 	
@@ -528,9 +530,9 @@ public class TEBatteryStation extends TECommonBench implements IEnergySource, II
 		switch(baseTier){
 		case 1:
 			return Info.KEY_BLOCK_NAMES[8] + Info.KEY_NAME_SUFFIX;
-		case 2:
-			return Info.KEY_BLOCK_NAMES[9] + Info.KEY_NAME_SUFFIX;
 		case 3:
+			return Info.KEY_BLOCK_NAMES[9] + Info.KEY_NAME_SUFFIX;
+		case 4:
 			return Info.KEY_BLOCK_NAMES[10] + Info.KEY_NAME_SUFFIX;
 		}
 		return "";

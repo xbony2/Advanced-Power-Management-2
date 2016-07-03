@@ -1,14 +1,14 @@
 blockChargingBench1.name=LV Charging Bench
-blockChargingBench2.name=MV Charging Bench
-blockChargingBench3.name=HV Charging Bench
+blockChargingBench2.name=HV Charging Bench
+blockChargingBench3.name=EV Charging Bench
 blockEmitterBlock1.name=LV Emitter
-blockEmitterBlock2.name=MV Emitter
-blockEmitterBlock3.name=HV Emitter
+blockEmitterBlock2.name=HV Emitter
+blockEmitterBlock3.name=EV Emitter
 blockAdjustableTransformer.name=Adjustable Transformer
 blockEmitterAdjustable.name=Adjustable Emitter
 blockBatteryStation1.name=LV Battery Station
-blockBatteryStation2.name=MV Battery Station
-blockBatteryStation3.name=HV Battery Station
+blockBatteryStation2.name=HV Battery Station
+blockBatteryStation3.name=EV Battery Station
 blockStorageMonitor.name=Storage Monitor
 
 AdvPwrMan.dir.down=Down
@@ -20,8 +20,8 @@ AdvPwrMan.dir.east=East
 
 item.benchTools.toolkit.name=Charging Bench Toolkit
 item.benchTools.LV-kit.name=LV Charging Bench Components
-item.benchTools.MV-kit.name=MV Charging Bench Components
-item.benchTools.HV-kit.name=HV Charging Bench Components
+item.benchTools.MV-kit.name=HV Charging Bench Components
+item.benchTools.HV-kit.name=EV Charging Bench Components
 
 item.itemStorageLinkCard.name=Energy Link Card
 item.itemStorageLinkCardCreator.name=Energy Link Card (Blank)

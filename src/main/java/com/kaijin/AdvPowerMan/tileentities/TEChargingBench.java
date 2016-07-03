@@ -745,9 +745,9 @@ public class TEChargingBench extends TECommonBench implements IEnergySink, IEner
 		switch(baseTier){
 		case 1:
 			return Info.KEY_BLOCK_NAMES[0] + Info.KEY_NAME_SUFFIX;
-		case 2:
-			return Info.KEY_BLOCK_NAMES[1] + Info.KEY_NAME_SUFFIX;
 		case 3:
+			return Info.KEY_BLOCK_NAMES[1] + Info.KEY_NAME_SUFFIX;
+		case 4:
 			return Info.KEY_BLOCK_NAMES[2] + Info.KEY_NAME_SUFFIX;
 		}
 		return "";
